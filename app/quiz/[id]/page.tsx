@@ -1,0 +1,44 @@
+import Providers from "@/app/Provider";
+import QuizProgress from "./QuizProgress";
+
+type PageProps = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export default async function QuizDetail({ params }: PageProps) {
+  const { id } = await params;
+
+  const res = await fetch(
+    `http://localhost:3000/api/searchAnalytics/detail?quiz_id=${id}`,
+    { cache: 'no-store' }
+  );
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch quiz data');
+  }
+
+  const quizData = await res.json();
+
+  const res2 = await fetch(
+    `http://localhost:3000/api/searchAnalytics/quiz_content?quiz_id=${id}`,
+    { cache: 'no-store' }
+  );
+
+  if (!res2.ok) {
+    throw new Error('Failed to fetch quiz data');
+  }
+
+  const quizContent = await res2.json();
+
+  return (
+    <div className="page">
+        <div className="container">
+          <Providers>
+            <QuizProgress quizData={quizData} quizContent={quizContent}></QuizProgress>
+          </Providers>
+        </div>
+    </div>
+  );
+}
