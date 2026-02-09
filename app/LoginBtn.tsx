@@ -18,7 +18,7 @@ export default function LoginBtn() {
             </div>: 
 
             <div className="logout">
-                {session.user.name}님
+                {session.user?.name}님
                 <div className="login-btn" onClick={() => {signOut()}}>                
                     로그아웃
                 </div>
