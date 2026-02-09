@@ -24,13 +24,13 @@ export default async function Home({searchParams}: PageProps) {
 
   const selectTag = Number(params.tag ?? 0);
 
-  const res = await fetch(`${baseUrl}/api/searchAnalytics/list?offset=${offset}&tag_id=${selectTag}`);
+  const res = await fetch(`${process.env.API_URL}/api/quiz/list?offset=${offset}&tag_id=${selectTag}`);
     if (!res.ok) {
     throw new Error('Failed to fetch quiz data');
   }
   const quizList = await res.json();
 
-  const res2 = await fetch(`${baseUrl}/api/searchAnalytics/tag_list`);
+  const res2 = await fetch(`${process.env.API_URL}/api/quiz/tag_list`);
   if (!res2.ok) {
     throw new Error('Failed to fetch quiz data');
   }

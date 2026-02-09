@@ -21,7 +21,7 @@ export default async function QuizDetail({ params }: PageProps) {
   const { id } = await params;
 
   const res = await fetch(
-    `${baseUrl}/api/searchAnalytics/detail?quiz_id=${id}`,
+    `${process.env.API_URL}/api/quiz/detail?quiz_id=${id}`,
     { cache: 'no-store' }
   );
 
@@ -32,7 +32,7 @@ export default async function QuizDetail({ params }: PageProps) {
   const quizData = await res.json();
 
   const res2 = await fetch(
-    `http://localhost:3000/api/searchAnalytics/quiz_content?quiz_id=${id}`,
+    `${process.env.API_URL}/api/quiz/quiz_content?quiz_id=${id}`,
     { cache: 'no-store' }
   );
 

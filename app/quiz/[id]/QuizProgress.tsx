@@ -45,7 +45,7 @@ export default function QuizProgress({quizData, quizContent}: {quizData: any, qu
                 login_user_id: session?.user?.user_id || 0
             };
 
-            await fetch("/api/searchAnalytics/quizSend", {
+            await fetch(`${process.env.API_URL}/api/quiz/quizSend`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

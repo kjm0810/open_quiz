@@ -150,7 +150,7 @@ export default function AddQuizPage({ tagList }: { tagList: {tag_id: number, nam
         });
 
         // setIsSend(true);
-        await fetch("/api/searchAnalytics/quiz_add", {
+        await fetch(`${process.env.API_URL}/api/quiz/quiz_add`, {
             method: "POST",
             body: quizForm,
             cache: "no-store",
