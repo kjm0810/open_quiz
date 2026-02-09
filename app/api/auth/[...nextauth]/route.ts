@@ -30,13 +30,13 @@ const authOptions = {
       const kakaoId = profile.id;
 
       const { exists } = await fetchApi(
-        `${process.env.API_URL}/api/auth/check_user`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/check_user`,
         "POST",
         { kakaoId }
       );
 
       if (!exists) {
-        await fetchApi(`${process.env.API_URL}/api/auth/create_user`, "POST", {
+        await fetchApi(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/create_user`, "POST", {
           kakaoId,
           name: generateRandomName(),
         });
@@ -55,7 +55,7 @@ const authOptions = {
         console.warn("token.kakaoId is missing");
         return session;
       }
-      const user = await fetchApi(`${process.env.API_URL}/api/auth/get_user?kakaoId=${token.kakaoId}`);
+      const user = await fetchApi(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/get_user?kakaoId=${token.kakaoId}`);
       session.user.user_id = user.user_id;
       session.user.name = user.name;
       return session;
