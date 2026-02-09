@@ -1,4 +1,5 @@
 'use client';
+import { put } from  '@vercel/blob';
 
 import { useState } from "react";
 type QuizItem = {
@@ -94,68 +95,104 @@ export default function AddQuizPage({ tagList }: { tagList: {tag_id: number, nam
         setCurrentEditQuiz(nextEditIndex);
     };
 
+
     const saveQuiz = async () => {
-        if (isSend) {
-            alert('저장중입니다. 잠시만 기다려 주세요.');
-            return;
+    if (isSend) {
+        alert('저장중입니다. 잠시만 기다려 주세요.');
+        return;
+    }
+    if (title === '') {
+        alert('제목을 입력해주세요.');
+        return;
+    }
+    if (description === '') {
+        alert('설명을 입력해주세요.');
+        return;
+    }
+    if (selectTag === 0) {
+        alert('카테고리를 선택해주세요.');
+        return;
+    }
+
+    for (let i = 0; i < quizContent.length; i++) {
+        const item = quizContent[i];
+        if (
+        item.answer1 === '' &&
+        item.answer2 === '' &&
+        item.answer3 === '' &&
+        item.answer4 === '' &&
+        item.answer5 === ''
+        ) {
+        alert(`${i + 1}번 문제에 정답 항목이 없습니다.`);
+        return;
         }
-        if (title === '') {
-            alert('제목을 입력해주세요.');
-            return;
+        if (item.answer_number === 0) {
+        alert(`${i + 1}번 문제에 정답이 없습니다.`);
+        return;
         }
-        if (description === '') {
-            alert('설명을 입력해주세요.');
-            return;
-        }
-        if (selectTag === 0) {
-            alert('카테고리를 선택해주세요.');
-            return;
-        }
+    }
 
-        quizContent.forEach((item, index: number) => {
-            if (item.answer1 === '' && item.answer2 === '' && item.answer3 === '' && item.answer4 === '' && item.answer5 === '' ) {
-                alert(`${index + 1}번 문제에 정답 항목이 없습니다.`);
-                return;
-            }
-            if (item.answer_number === 0) {
-                alert(`${index + 1}번 문제에 정답이 없습니다.`);
-            }
-        });
-
-
-        const quizForm = new FormData();
-
-        quizForm.append('title', title);
-        quizForm.append('description', description);
-        // @ts-ignore
-        quizForm.append('user_id', String(session?.user?.user_id ?? 0));
-        
-        quizForm.append('tag_id', String(selectTag));
-
+    try {
+        // ---------------- 이미지 업로드 ----------------
+        let thumbnailUrl = null;
         if (thumbnailFile) {
-            quizForm.append('thumbnail_image', thumbnailFile);
+        console.log('Thumbnail uploading...');
+        const buffer = await thumbnailFile.arrayBuffer();
+        const blob = await put(
+            `quiz/thumbnails/${Date.now()}.webp`,
+            Buffer.from(buffer),
+            { access: 'public', token: 'vercel_blob_rw_q9aHyugblERVQZFM_4jsLWGPjC2mupTKlyv70lFVddRlKQg' }
+        );
+        thumbnailUrl = blob.url;
+        console.log('Thumbnail uploaded:', thumbnailUrl);
         }
 
-        quizForm.append(
-            'quiz_content',
-            JSON.stringify(
-                quizContent.map(({ content_img, ...rest }) => rest)
-            )
+        // quiz content 이미지 업로드
+        const updatedQuizContent = await Promise.all(
+        quizContent.map(async (item, index) => {
+            let contentImgUrl = null;
+            if (item.content_img) {
+            console.log(`Content image ${index} uploading...`);
+            const buffer = await item.content_img.arrayBuffer();
+            const blob = await put(
+                `quiz/contents/${Date.now()}_${index}.webp`,
+                Buffer.from(buffer),
+                { access: 'public', token: 'vercel_blob_rw_q9aHyugblERVQZFM_4jsLWGPjC2mupTKlyv70lFVddRlKQg' }
+            );
+            contentImgUrl = blob.url;
+            console.log(`Content image ${index} uploaded:`, contentImgUrl);
+            }
+            return {
+            ...item,
+            content_img_url: contentImgUrl, // URL 추가
+            };
+        })
         );
 
-        quizContent.forEach((item, index) => {
-            if (item.content_img) {
-                quizForm.append(`content_img_${index}`, item.content_img);
-            }
+        // ---------------- 서버 전송 ----------------
+        const payload = {
+        title,
+        description,
+        user_id: session?.user?.user_id ?? 0,
+        tag_id: selectTag,
+        thumbnail_url: thumbnailUrl,
+        quiz_content: updatedQuizContent.map(({ content_img, ...rest }) => rest),
+        };
+
+        const res = await fetch('http://kjmpp.cafe24app.com/api/quiz/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
         });
 
-        // setIsSend(true);
-        await fetch(`${process.env.API_URL}/api/quiz/quiz_add`, {
-            method: "POST",
-            body: quizForm,
-            cache: "no-store",
-        })
+        if (!res.ok) throw new Error('서버 저장 실패');
+        alert('퀴즈가 저장되었습니다.');
+    } catch (e) {
+        console.error('퀴즈 저장 에러:', e);
+        alert('퀴즈 저장 중 오류가 발생했습니다.');
     }
+    };
+
     return (
         <div className="add-page">
             
