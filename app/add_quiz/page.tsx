@@ -1,8 +1,19 @@
 import Providers from "../Provider";
 import AddQuizPage from "./AddQuizPage";
+import { headers } from 'next/headers';
 
 export default async function AddQuiz() {
-    const res2 = await fetch(`http://localhost:3000/api/searchAnalytics/tag_list`);
+    const headersList = await headers(); // ✅ 반드시 await
+
+    const protocol =
+        headersList.get('x-forwarded-proto') ?? 'http';
+    const host =
+        headersList.get('x-forwarded-host') ??
+        headersList.get('host');
+
+    const baseUrl = `${protocol}://${host}`;
+
+    const res2 = await fetch(`${baseUrl}/api/searchAnalytics/tag_list`);
     if (!res2.ok) {
         throw new Error('Failed to fetch quiz data');
     }

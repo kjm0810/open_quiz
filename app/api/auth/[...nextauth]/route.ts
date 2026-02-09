@@ -15,7 +15,7 @@ export const authOptions = {
   ],
 
   callbacks: {
-    async signIn({ profile }) {
+    async signIn({ profile }: any) {
       const kakaoId = profile.id;
 
       const [rows]: any = await db.query(
@@ -36,14 +36,14 @@ export const authOptions = {
       return true;
     },
 
-    async jwt({ token, profile }) {
+    async jwt({ token, profile }: any) {
       if (profile) {
         token.kakaoId = profile.id;
       }
       return token;
     },
 
-    async session({ session, token }) {
+    async session({ session, token }: any) {
       const [rows]: any = await db.query(
         "SELECT user_id, name FROM quiz_user WHERE kakao_id = ?",
         [token.kakaoId]

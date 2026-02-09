@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { headers } from 'next/headers';
 import Image from 'next/image'
 import TapFilter from "./TapFilter";
 type PageProps = {
@@ -9,18 +10,27 @@ type PageProps = {
 
 
 export default async function Home({searchParams}: PageProps) {
+  const headersList = await headers(); // ✅ 반드시 await
+
+  const protocol =
+      headersList.get('x-forwarded-proto') ?? 'http';
+  const host =
+      headersList.get('x-forwarded-host') ??
+      headersList.get('host');
+
+  const baseUrl = `${protocol}://${host}`;
   let offset = 0;
   const params = await searchParams;
 
   const selectTag = Number(params.tag ?? 0);
 
-  const res = await fetch(`http://localhost:3000/api/searchAnalytics/list?offset=${offset}&tag_id=${selectTag}`);
+  const res = await fetch(`${baseUrl}/api/searchAnalytics/list?offset=${offset}&tag_id=${selectTag}`);
     if (!res.ok) {
     throw new Error('Failed to fetch quiz data');
   }
   const quizList = await res.json();
 
-  const res2 = await fetch(`http://localhost:3000/api/searchAnalytics/tag_list`);
+  const res2 = await fetch(`${baseUrl}/api/searchAnalytics/tag_list`);
   if (!res2.ok) {
     throw new Error('Failed to fetch quiz data');
   }

@@ -2,7 +2,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 
 
-export default function TapFilter(props) {
+export default function TapFilter(props: any) {
     const router = useRouter();
 
     return (
@@ -11,7 +11,7 @@ export default function TapFilter(props) {
                 전체
             </div>
             {
-                props.tagList.map((tag, index: number) => {
+                props.tagList.map((tag: {tag_id: number, name: string}, index: number) => {
                     return (
                         <div className={`tap tap-${tag.tag_id}`} key={index} onClick={() => router.push(`/?tag=${tag.tag_id}`)}>
                             {tag.name}

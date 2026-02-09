@@ -16,7 +16,7 @@ type QuizItem = {
 }
 import { useSession } from "next-auth/react";
 
-export default function AddQuizPage({tagList}: {tagList:{tag_id: number, name: string}}) {
+export default function AddQuizPage({ tagList }: { tagList: {tag_id: number, name: string}[] } ) {
     const { data: session, status } = useSession();
 
     const [selectTag, setSelectTag] = useState(0);
@@ -127,7 +127,9 @@ export default function AddQuizPage({tagList}: {tagList:{tag_id: number, name: s
 
         quizForm.append('title', title);
         quizForm.append('description', description);
+        // @ts-ignore
         quizForm.append('user_id', String(session?.user?.user_id ?? 0));
+        
         quizForm.append('tag_id', String(selectTag));
 
         if (thumbnailFile) {
@@ -185,7 +187,7 @@ export default function AddQuizPage({tagList}: {tagList:{tag_id: number, name: s
                 카테고리
             </div>
             <div className="tags">
-                {tagList.map((tag, index) => {
+                {tagList.map((tag: { tag_id: number; name: string }, index) => {
                     return (
                         <div className={`tag tag-${tag.tag_id} ${selectTag === tag.tag_id ? 'selected' : ''}`} key={index} onClick={() => {setSelectTag(tag.tag_id)}}>
                             {tag.name}

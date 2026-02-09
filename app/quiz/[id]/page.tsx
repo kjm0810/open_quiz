@@ -1,5 +1,6 @@
 import Providers from "@/app/Provider";
 import QuizProgress from "./QuizProgress";
+import { headers } from 'next/headers';
 
 type PageProps = {
   params: Promise<{
@@ -8,10 +9,19 @@ type PageProps = {
 };
 
 export default async function QuizDetail({ params }: PageProps) {
+  const headersList = await headers(); // ✅ 반드시 await
+
+  const protocol =
+      headersList.get('x-forwarded-proto') ?? 'http';
+  const host =
+      headersList.get('x-forwarded-host') ??
+      headersList.get('host');
+
+  const baseUrl = `${protocol}://${host}`;
   const { id } = await params;
 
   const res = await fetch(
-    `http://localhost:3000/api/searchAnalytics/detail?quiz_id=${id}`,
+    `${baseUrl}/api/searchAnalytics/detail?quiz_id=${id}`,
     { cache: 'no-store' }
   );
 
