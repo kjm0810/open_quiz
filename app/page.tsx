@@ -50,8 +50,6 @@ export default async function Home({searchParams}: PageProps) {
   return (
     <div className="page">
       <div className="container">
-        {protocol}
-        {host}
         {/* <div className="filter">
           <div className="left">
             <div className="tags">
@@ -68,7 +66,7 @@ export default async function Home({searchParams}: PageProps) {
             <div className="empty-quiz">
               퀴즈가 없습니다!
             </div> :null 
-          }
+          } */}
           {
             quizList.map( (item: any) => {
               return (
@@ -96,7 +94,7 @@ export default async function Home({searchParams}: PageProps) {
               )
             })
           }
-        </div> */}
+        </div>
       </div>
     </div>
   );
