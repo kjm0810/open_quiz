@@ -23,13 +23,21 @@ export default async function Home({searchParams}: PageProps) {
 
   const selectTag = Number(params.tag ?? 0);
 
-  const res = await fetch(`${protocol}://${host}/api/searchAnalytics/list?offset=${offset}&tag_id=${selectTag}`, {
-    cache: 'no-store',
-  });
-    if (!res.ok) {
-    // throw new Error('Failed to fetch quiz data');
+  let quizList = [];
+  try {
+    const res = await fetch(`${protocol}://${host}/api/searchAnalytics/list?offset=${offset}&tag_id=${selectTag}`, {
+      cache: 'no-store',
+    });
+
+    if (res.ok) {
+      quizList = await res.json();
+    } else {
+      console.error('API returned error:', res.status, await res.text());
+    }
+  } catch (err) {
+    console.error('Fetch failed:', err);
+    quizList = [];
   }
-  const quizList = await res.json();
 
   // const res2 = await fetch(`${protocol}://${host}/api/searchAnalytics/tag_list`, {
   //   cache: 'no-store',
