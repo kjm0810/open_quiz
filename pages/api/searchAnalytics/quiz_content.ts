@@ -8,8 +8,8 @@ export default async function handler(
 
     const quizId = req.query.quiz_id;
     try {
-        const [rows] = await db.query(
-        'SELECT * FROM quiz_content where quiz_id = ?',
+        const rows = await db.query(
+            'SELECT * FROM quiz_content WHERE quiz_id = $1',
             [quizId]
         );
 

@@ -179,7 +179,7 @@ export default function AddQuizPage({ tagList }: { tagList: {tag_id: number, nam
         quiz_content: updatedQuizContent.map(({ content_img, ...rest }) => rest),
         };
 
-        const res = await fetch('https://open-quiz-back.onrender.com/api/quiz/add', {
+        const res = await fetch('/api/searchAnalytics/quiz_add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

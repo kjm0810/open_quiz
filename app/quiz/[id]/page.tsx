@@ -17,11 +17,12 @@ export default async function QuizDetail({ params }: PageProps) {
       headersList.get('x-forwarded-host') ??
       headersList.get('host');
 
-  const baseUrl = `${protocol}://${host}`;
   const { id } = await params;
 
+  const baseUrl = `${protocol}://${host}`;
+
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/quiz/detail?quiz_id=${id}`,
+    `${baseUrl}/api/searchAnalytics/detail?quiz_id=${id}`,
     { cache: 'no-store' }
   );
 
@@ -32,7 +33,7 @@ export default async function QuizDetail({ params }: PageProps) {
   const quizData = await res.json();
 
   const res2 = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/quiz/quiz_content?quiz_id=${id}`,
+    `${baseUrl}/api/searchAnalytics/quiz_content?quiz_id=${id}`,
     { cache: 'no-store' }
   );
 

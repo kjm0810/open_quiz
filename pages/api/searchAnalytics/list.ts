@@ -12,13 +12,13 @@ export default async function handler(
     const params: any[] = [];
 
     if (tagId !== 0) {
-      sql += ' WHERE tag_id = ?';
+      sql += ' WHERE tag_id = $1';
       params.push(tagId);
     }
 
     sql += ' ORDER BY quiz_id DESC';
 
-    const [rows] = await db.query(sql, params);
+    const rows = await db.query(sql, params);
 
     return res.status(200).json(rows);
   } catch (error) {

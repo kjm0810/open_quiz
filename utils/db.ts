@@ -1,13 +1,26 @@
-import mysql from 'mysql2/promise';
+import { Pool } from 'pg';
 
-const pool = mysql.createPool({
+const pool = new Pool({
     host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT) || 5432,
+    database: process.env.DB_NAME,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
-})
+    ssl: {
+        rejectUnauthorized: false,
+    },
+});
 
-export default pool;
+/**
+ * pg 호환 래퍼
+ * 기존 mysql2/promise의 `const [rows] = await db.query(...)` 패턴을
+ * 최대한 유지하기 위해 rows 배열만 반환합니다.
+ */
+const db = {
+    query: async (text: string, params?: any[]) => {
+        const result = await pool.query(text, params);
+        return result.rows;
+    },
+};
+
+export default db;

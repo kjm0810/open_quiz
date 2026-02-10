@@ -1,17 +1,7 @@
 // app/api/auth/[...nextauth]/route.ts
 import NextAuth from "next-auth";
 import KakaoProvider from "next-auth/providers/kakao";
-
-// DB 대신 Express API 호출
-async function fetchApi(url: string, method = "GET", body?: any) {
-  const res = await fetch(url, {
-    method,
-    headers: { "Content-Type": "application/json" },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
-  return res.json();
-}
+import db from "@/utils/db";
 
 function generateRandomName(): string {
   return Math.floor(10000 + Math.random() * 90000).toString();
@@ -29,17 +19,18 @@ const authOptions = {
     async signIn({ profile }: any) {
       const kakaoId = profile.id;
 
-      const { exists } = await fetchApi(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/check_user`,
-        "POST",
-        { kakaoId }
+      // 사용자 존재 여부 확인
+      const existing = await db.query(
+        "SELECT user_id FROM users WHERE kakao_id = $1",
+        [kakaoId]
       );
 
-      if (!exists) {
-        await fetchApi(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/create_user`, "POST", {
-          kakaoId,
-          name: generateRandomName(),
-        });
+      if (!existing || existing.length === 0) {
+        const name = generateRandomName();
+        await db.query(
+          "INSERT INTO users (kakao_id, name) VALUES ($1, $2)",
+          [kakaoId, name]
+        );
       }
 
       return true;
@@ -55,9 +46,18 @@ const authOptions = {
         console.warn("token.kakaoId is missing");
         return session;
       }
-      const user = await fetchApi(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/get_user?kakaoId=${token.kakaoId}`);
-      session.user.user_id = user.user_id;
-      session.user.name = user.name;
+
+      const users = await db.query(
+        "SELECT user_id, name FROM users WHERE kakao_id = $1",
+        [token.kakaoId]
+      );
+      const user = users[0];
+
+      if (user) {
+        session.user.user_id = user.user_id;
+        session.user.name = user.name;
+      }
+
       return session;
     },
   },

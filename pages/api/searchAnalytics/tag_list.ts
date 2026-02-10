@@ -7,7 +7,7 @@ export default async function handler(
 ) {
 
     try {
-        const [rows] = await db.query(
+        const rows = await db.query(
         'SELECT * FROM quiz_tag'
         );
 

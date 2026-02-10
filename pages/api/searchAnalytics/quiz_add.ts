@@ -1,108 +1,57 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from '@/utils/db';
-import formidable from "formidable";
-import sharp from "sharp";
-import { put } from "@vercel/blob";
-import fs from "fs";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
+/**
+ * 외부 Express API(`/api/quiz/add`) 대신 사용하는 내부 API
+ * 클라이언트에서 이미 Blob URL을 만들어온 JSON payload를 저장만 합니다.
+ */
 export default async function Quiz_add(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).end();
   }
 
-  const form = formidable({
-    multiples: false,
-    keepExtensions: true,
-  });
-
   try {
-    const { fields, files } = await new Promise<any>((resolve, reject) => {
-      form.parse(req, (err, fields, files) => {
-        if (err) reject(err);
-        resolve({ fields, files });
-      });
-    });
+    const {
+      title,
+      description,
+      user_id,
+      tag_id,
+      thumbnail_url,
+      quiz_content,
+    } = req.body;
 
-    if (!fields?.quiz_content || fields.quiz_content.length === 0) {
+    if (!quiz_content || !Array.isArray(quiz_content) || quiz_content.length === 0) {
       return res.status(400).json({ error: "invalid_answer" });
     }
 
-    /* ===============================
-       썸네일 이미지 → Vercel Blob
-    =============================== */
-    let thumbnailUrl: string | null = null;
-    const thumbFile = files.thumbnail_image?.[0];
-
-    if (thumbFile) {
-      const buffer = await sharp(thumbFile.filepath)
-        .resize({ width: 720 })
-        .webp({ quality: 80 })
-        .toBuffer();
-
-      const blob = await put(
-        `quiz/thumbnails/${Date.now()}.webp`,
-        buffer,
-        { access: "public" }
-      );
-
-      thumbnailUrl = blob.url;
-    }
-
-    /* ===============================
-       quiz_list INSERT
-    =============================== */
-    const [insertResult]: any = await db.query(
+    // quiz_list INSERT
+    const quizListRows = await db.query(
       `
       INSERT INTO quiz_list
       (title, description, user_id, tag_id, thumbnail_img_url)
-      VALUES (?, ?, ?, ?, ?)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING quiz_id
       `,
       [
-        fields.title,
-        fields.description,
-        fields.user_id,
-        fields.tag_id,
-        thumbnailUrl,
+        title,
+        description,
+        user_id,
+        tag_id,
+        thumbnail_url,
       ]
     );
 
-    const insertId = insertResult.insertId;
-    const quizContent = JSON.parse(fields.quiz_content[0]);
+    const insertId = quizListRows[0]?.quiz_id;
 
-    /* ===============================
-       콘텐츠 이미지 → Vercel Blob
-    =============================== */
-    for (let index = 0; index < quizContent.length; index++) {
-      const item = quizContent[index];
-      let contentImgUrl: string | null = null;
-
-      const contentFile = files[`content_img_${index}`]?.[0];
-      if (contentFile) {
-        const buffer = await sharp(contentFile.filepath)
-          .resize({ width: 720 })
-          .webp({ quality: 80 })
-          .toBuffer();
-
-        const blob = await put(
-          `quiz/contents/${insertId}_${index}.webp`,
-          buffer,
-          { access: "public" }
-        );
-
-        contentImgUrl = blob.url;
-      }
+    // quiz_content INSERT
+    for (let index = 0; index < quiz_content.length; index++) {
+      const item = quiz_content[index];
 
       await db.query(
         `
         INSERT INTO quiz_content
         (quiz_id, content, type, answer1, answer2, answer3, answer4, answer5, content_img_url, answer_number)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         `,
         [
           insertId,
@@ -113,7 +62,7 @@ export default async function Quiz_add(req: NextApiRequest, res: NextApiResponse
           item.answer3,
           item.answer4,
           item.answer5,
-          contentImgUrl,
+          item.content_img_url,
           item.answer_number,
         ]
       );
@@ -121,11 +70,10 @@ export default async function Quiz_add(req: NextApiRequest, res: NextApiResponse
 
     return res.status(200).json({
       success: true,
-      thumbnail: thumbnailUrl,
     });
 
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: "Image processing failed" });
+    return res.status(500).json({ error: "DB insert failed" });
   }
 }

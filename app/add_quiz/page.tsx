@@ -13,7 +13,9 @@ export default async function AddQuiz() {
 
     const baseUrl = `${protocol}://${host}`;
 
-    const res2 = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/quiz/tag_list`);
+    const res2 = await fetch(`${baseUrl}/api/searchAnalytics/tag_list`, {
+        cache: 'no-store',
+    });
     if (!res2.ok) {
         throw new Error('Failed to fetch quiz data');
     }

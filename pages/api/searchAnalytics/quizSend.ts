@@ -7,8 +7,8 @@ export default async function handler(
 ) {
 
     try {
-        const [rows] = await db.query(
-            'INSERT INTO quiz_result (adjust_percent, isLogin, login_user_id, quiz_id) VALUES (?, ?, ?, ?)',
+        const rows = await db.query(
+            'INSERT INTO quiz_result (adjust_percent, isLogin, login_user_id, quiz_id) VALUES ($1, $2, $3, $4) RETURNING *',
             [req.body.adjust_percent, req.body.isLogin, req.body.login_user_id, req.body.quiz_id]
         );
 
