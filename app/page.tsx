@@ -23,21 +23,13 @@ export default async function Home({searchParams}: PageProps) {
 
   const selectTag = Number(params.tag ?? 0);
 
-  let quizList = [];
-  try {
-    const res = await fetch(`${protocol}://${host}/api/searchAnalytics/list?offset=${offset}&tag_id=${selectTag}`, {
-      cache: 'no-store',
-    });
-
-    if (res.ok) {
-      quizList = await res.json();
-    } else {
-      console.error('API returned error:', res.status, await res.text());
-    }
-  } catch (err) {
-    console.error('Fetch failed:', err);
-    quizList = [];
+  const res = await fetch(`${protocol}://${host}/api/searchAnalytics/list?offset=${offset}&tag_id=${selectTag}`, {
+    cache: 'no-store',
+  });
+    if (!res.ok) {
+    // throw new Error('Failed to fetch quiz data');
   }
+  const quizList = await res.json();
 
   // const res2 = await fetch(`${protocol}://${host}/api/searchAnalytics/tag_list`, {
   //   cache: 'no-store',
@@ -50,6 +42,8 @@ export default async function Home({searchParams}: PageProps) {
   return (
     <div className="page">
       <div className="container">
+        {protocol}
+        {host}
         {/* <div className="filter">
           <div className="left">
             <div className="tags">
@@ -66,7 +60,7 @@ export default async function Home({searchParams}: PageProps) {
             <div className="empty-quiz">
               퀴즈가 없습니다!
             </div> :null 
-          } */}
+          }
           {
             quizList.map( (item: any) => {
               return (
@@ -94,8 +88,8 @@ export default async function Home({searchParams}: PageProps) {
               )
             })
           }
-        </div>
+        </div> */}
       </div>
-    // </div>
+    </div>
   );
 }
