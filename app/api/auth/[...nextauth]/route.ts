@@ -21,14 +21,14 @@ const authOptions = {
 
       // 사용자 존재 여부 확인
       const existing = await db.query(
-        "SELECT user_id FROM users WHERE kakao_id = $1",
+        "SELECT user_id FROM quiz_user WHERE kakao_id = $1",
         [kakaoId]
       );
 
       if (!existing || existing.length === 0) {
         const name = generateRandomName();
         await db.query(
-          "INSERT INTO users (kakao_id, name) VALUES ($1, $2)",
+          "INSERT INTO quiz_user (kakao_id, name) VALUES ($1, $2)",
           [kakaoId, name]
         );
       }
@@ -48,7 +48,7 @@ const authOptions = {
       }
 
       const users = await db.query(
-        "SELECT user_id, name FROM users WHERE kakao_id = $1",
+        "SELECT user_id, name FROM quiz_user WHERE kakao_id = $1",
         [token.kakaoId]
       );
       const user = users[0];
