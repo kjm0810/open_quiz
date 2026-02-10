@@ -17,7 +17,7 @@ export default async function AddQuiz() {
         cache: 'no-store',
     });
     if (!res2.ok) {
-        throw new Error('Failed to fetch quiz data');
+        // throw new Error('Failed to fetch quiz data');
     }
     const tagList = await res2.json();
 

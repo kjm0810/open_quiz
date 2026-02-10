@@ -27,7 +27,7 @@ export default async function QuizDetail({ params }: PageProps) {
   );
 
   if (!res.ok) {
-    throw new Error('Failed to fetch quiz data');
+    // throw new Error('Failed to fetch quiz data');
   }
 
   const quizData = await res.json();
@@ -38,7 +38,7 @@ export default async function QuizDetail({ params }: PageProps) {
   );
 
   if (!res2.ok) {
-    throw new Error('Failed to fetch quiz data');
+    // throw new Error('Failed to fetch quiz data');
   }
 
   const quizContent = await res2.json();

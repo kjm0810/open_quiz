@@ -185,7 +185,7 @@ export default function AddQuizPage({ tagList }: { tagList: {tag_id: number, nam
         body: JSON.stringify(payload),
         });
 
-        if (!res.ok) throw new Error('서버 저장 실패');
+        // if (!res.ok) throw new Error('서버 저장 실패');
         alert('퀴즈가 저장되었습니다.');
     } catch (e) {
         console.error('퀴즈 저장 에러:', e);
