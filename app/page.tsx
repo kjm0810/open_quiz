@@ -39,21 +39,18 @@ export default async function Home({searchParams}: PageProps) {
     quizList = [];
   }
 
-  // const res2 = await fetch(`${protocol}://${host}/api/searchAnalytics/tag_list`, {
-  //   cache: 'no-store',
-  // });
-  // if (!res2.ok) {
-  //   // throw new Error('Failed to fetch quiz data');
-  // }
-  // const tagList = await res2.json();
+  const res2 = await fetch(`${protocol}://${host}/api/searchAnalytics/tag_list`, {
+    cache: 'no-store',
+  });
+  if (!res2.ok) {
+    // throw new Error('Failed to fetch quiz data');
+  }
+  const tagList = await res2.json();
 
   return (
     <div className="page">
       <div className="container">
-        {protocol}
-        {host}
-        {JSON.stringify(quizList)}
-        {/* <div className="filter">
+        <div className="filter">
           <div className="left">
             <div className="tags">
               <TapFilter tagList={tagList}></TapFilter>
@@ -97,7 +94,7 @@ export default async function Home({searchParams}: PageProps) {
               )
             })
           }
-        </div> */}
+        </div>
       </div>
     </div>
   );
