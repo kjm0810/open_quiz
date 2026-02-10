@@ -18,18 +18,18 @@ export default async function Home({searchParams}: PageProps) {
       headersList.get('x-forwarded-host') ??
       headersList.get('host');
 
-  // let offset = 0;
-  // const params = await searchParams;
+  let offset = 0;
+  const params = await searchParams;
 
-  // const selectTag = Number(params.tag ?? 0);
+  const selectTag = Number(params.tag ?? 0);
 
-  // const res = await fetch(`${protocol}://${host}/api/searchAnalytics/list?offset=${offset}&tag_id=${selectTag}`, {
-  //   cache: 'no-store',
-  // });
-  //   if (!res.ok) {
-  //   // throw new Error('Failed to fetch quiz data');
-  // }
-  // const quizList = await res.json();
+  const res = await fetch(`${protocol}://${host}/api/searchAnalytics/list?offset=${offset}&tag_id=${selectTag}`, {
+    cache: 'no-store',
+  });
+    if (!res.ok) {
+    // throw new Error('Failed to fetch quiz data');
+  }
+  const quizList = await res.json();
 
   // const res2 = await fetch(`${protocol}://${host}/api/searchAnalytics/tag_list`, {
   //   cache: 'no-store',
