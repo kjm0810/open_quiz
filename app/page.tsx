@@ -52,6 +52,7 @@ export default async function Home({searchParams}: PageProps) {
       <div className="container">
         {protocol}
         {host}
+        {JSON.stringify(quizList)}
         {/* <div className="filter">
           <div className="left">
             <div className="tags">
