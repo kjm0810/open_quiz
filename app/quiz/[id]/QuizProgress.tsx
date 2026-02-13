@@ -118,7 +118,7 @@ export default function QuizProgress({quizData, quizContent}: {quizData: any, qu
 
                             >
                                 <div className="text">
-                                    {(adjustCount / quizLength) * 100}%
+                                    {Math.trunc((adjustCount / quizLength) * 100)}%
                                 </div>
                             </div>
                             총 <span className="count">{quizLength}</span>문제 중에서 <span className="count">{adjustCount}</span>문제 맞추셨습니다.<br/>

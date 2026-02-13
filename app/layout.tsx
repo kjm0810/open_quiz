@@ -56,6 +56,19 @@ export default function RootLayout({
           </div>
         </header>
         {children}
+
+        <div className="footer">
+          <div className="container">
+            <div className="footer-wrap">
+              <p className="exp">
+                본 웹사이트는 김정민의 개인 프로젝트 목적으로 제작되었습니다. 
+                카카오 계정의 개인 식별값 외에는 개인정보를 수집하지 않으며, 
+                사이트는 언제든지 폐쇄될 수 있고 자료가 삭제될 수 있습니다.
+              </p>
+              <p className="copyright">© 2026 김정민. All rights reserved.</p>
+            </div>
+          </div>
+        </div>
       </body>
     </html>
   );

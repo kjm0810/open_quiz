@@ -16,8 +16,10 @@ type QuizItem = {
     answer_number: number
 }
 import { useSession } from "next-auth/react";
+import { useRouter } from 'next/navigation';
 
 export default function AddQuizPage({ tagList }: { tagList: {tag_id: number, name: string}[] } ) {
+    const router = useRouter();
     const { data: session, status } = useSession();
 
     const [selectTag, setSelectTag] = useState(0);
@@ -180,13 +182,15 @@ export default function AddQuizPage({ tagList }: { tagList: {tag_id: number, nam
         };
 
         const res = await fetch('/api/searchAnalytics/quiz_add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
         });
 
         // if (!res.ok) throw new Error('서버 저장 실패');
         alert('퀴즈가 저장되었습니다.');
+        router.push(`/`);
+
     } catch (e) {
         console.error('퀴즈 저장 에러:', e);
         alert('퀴즈 저장 중 오류가 발생했습니다.');

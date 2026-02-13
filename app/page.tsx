@@ -2,6 +2,7 @@ import Link from "next/link";
 import { headers } from 'next/headers';
 import Image from 'next/image'
 import TapFilter from "./TapFilter";
+import QuizList from "./QuizList";
 type PageProps = {
   searchParams: {
     tag?: string;
@@ -18,26 +19,9 @@ export default async function Home({searchParams}: PageProps) {
       headersList.get('x-forwarded-host') ??
       headersList.get('host');
 
-  let offset = 0;
   const params = await searchParams;
 
   const selectTag = Number(params.tag ?? 0);
-
-  let quizList = [];
-  try {
-    const res = await fetch(`${protocol}://${host}/api/searchAnalytics/list?offset=${offset}&tag_id=${selectTag}`, {
-      cache: 'no-store',
-    });
-
-    if (res.ok) {
-      quizList = await res.json();
-    } else {
-      console.error('API returned error:', res.status, await res.text());
-    }
-  } catch (err) {
-    console.error('Fetch failed:', err);
-    quizList = [];
-  }
 
   const res2 = await fetch(`${protocol}://${host}/api/searchAnalytics/tag_list`, {
     cache: 'no-store',
@@ -60,41 +44,7 @@ export default async function Home({searchParams}: PageProps) {
 
           </div>
         </div>
-        <div className="quiz-list">
-          {
-            quizList.length === 0 ? 
-            <div className="empty-quiz">
-              퀴즈가 없습니다!
-            </div> :null 
-          }
-          {
-            quizList.map( (item: any) => {
-              return (
-                <Link href={`/quiz/${item.quiz_id}`} className="item" key={item.quiz_id}>
-                  <div className={`thumb-nail ${item.thumbnail_img_url === null || item.thumbnail_img_url === '' ? 'no-image' : ''}`}>
-                    <div className="img">
-                      {
-                        item.thumbnail_img_url !== null && item.thumbnail_img_url !== '' ? 
-                        <img src={`${item.thumbnail_img_url}`} alt="" style={{ objectFit: "cover" }}/> : null
-                      }
-                      <div className="tags">
-                        <div className={`tag tag-${item.tag_id}`}>{tagList.find((tag_item: any) => {return tag_item.tag_id === item.tag_id})?.name}</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="title">
-                    [{item.title}]
-                  </div>
-                  <div className="content-box">
-                    <div className="content">
-                      {item.description}
-                    </div>
-                  </div>
-                </Link>
-              )
-            })
-          }
-        </div>
+        <QuizList selectTag={selectTag} tagList={tagList}></QuizList>         
       </div>
     </div>
   );
