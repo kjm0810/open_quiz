@@ -25,6 +25,7 @@ export default function AddQuizPage({ tagList }: { tagList: {tag_id: number, nam
     const [selectTag, setSelectTag] = useState(0);
     const [currentEditQuiz, setCurrentEditQuiz] = useState(0);
     const [title, setTitle] = useState('');
+    const [subtitle, setSubtitle] = useState('');
     const [description, setDescription] = useState('');
 
     const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
@@ -174,6 +175,7 @@ export default function AddQuizPage({ tagList }: { tagList: {tag_id: number, nam
         // ---------------- 서버 전송 ----------------
         const payload = {
         title,
+        subtitle: subtitle || null,
         description,
         user_id: session?.user?.user_id ?? 0,
         tag_id: selectTag,
@@ -203,26 +205,22 @@ export default function AddQuizPage({ tagList }: { tagList: {tag_id: number, nam
             <div className="sub-title">
                 제목
             </div>
-
             <input type="text" className="input-field"
                 placeholder="제목을 입력해주세요."
                 value={title}
-                onChange={(e) => {
-                    setTitle(e.target.value);
-                }}
+                onChange={(e) => setTitle(e.target.value)}
             />
 
-            <div className="sub-title">
-                설명
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                <div style={{ flex: '1 1 200px' }}>
+                    <div className="sub-title">부제목</div>
+                    <input type="text" className="input-field" placeholder="부제목 (선택)" value={subtitle} onChange={(e) => setSubtitle(e.target.value)} />
+                </div>
+                <div style={{ flex: '1 1 200px' }}>
+                    <div className="sub-title">설명</div>
+                    <input type="text" className="input-field" placeholder="설명을 입력해주세요." value={description} onChange={(e) => setDescription(e.target.value)} />
+                </div>
             </div>
-
-            <input type="text" className="input-field" 
-                placeholder="내용을 입력해주세요."
-                value={description}
-                onChange={(e) => {
-                    setDescription(e.target.value);
-                }}
-            />
 
             <div className="sub-title">
                 카테고리

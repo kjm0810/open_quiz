@@ -13,6 +13,7 @@ export default async function Quiz_add(req: NextApiRequest, res: NextApiResponse
   try {
     const {
       title,
+      subtitle,
       description,
       user_id,
       tag_id,
@@ -28,12 +29,13 @@ export default async function Quiz_add(req: NextApiRequest, res: NextApiResponse
     const quizListRows = await db.query(
       `
       INSERT INTO quiz_list
-      (title, description, user_id, tag_id, thumbnail_img_url)
-      VALUES ($1, $2, $3, $4, $5)
+      (title, subtitle, description, user_id, tag_id, thumbnail_img_url)
+      VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING quiz_id
       `,
       [
         title,
+        subtitle ?? null,
         description,
         user_id,
         tag_id,
