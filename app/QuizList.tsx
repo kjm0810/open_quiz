@@ -94,8 +94,8 @@ export default function QuizList({
           }
           return merged;
         });
-      } catch (e: any) {
-        if (e?.name !== 'AbortError') {
+      } catch (e: unknown) {
+        if (!(e instanceof DOMException && e.name === 'AbortError')) {
           console.error('Fetch failed:', e);
         }
       } finally {
@@ -109,6 +109,10 @@ export default function QuizList({
     return () => controller.abort();
   }, [offset, selectTag, hasMore]); // ✅ 핵심
 
+  const getTagName = (tagId: number) => {
+    return tagList.find((tag) => tag.tag_id === tagId)?.name ?? "카테고리";
+  };
+
   return (
     <div className="quiz-list">
       {!isLoading && quizList.length === 0 ? (
@@ -119,18 +123,21 @@ export default function QuizList({
             <div className={`thumb-nail ${!item.thumbnail_img_url ? 'no-image' : ''}`}>
               <div className="img">
                 {item.thumbnail_img_url ? (
-                  <img src={item.thumbnail_img_url} alt="" style={{ objectFit: "cover" }} />
+                  <img src={item.thumbnail_img_url} alt={item.title} style={{ objectFit: "cover" }} />
                 ) : null}
-                <div className="tags">
-                  <div className={`tag tag-${item.tag_id}`}>
-                    {tagList.find(t => t.tag_id === item.tag_id)?.name}
-                  </div>
-                </div>
               </div>
             </div>
-            <div className="title">[{item.title}]</div>
-            <div className="content-box">
-              <div className="content">{item.description}</div>
+            <div className="item-body">
+              <div className="title">{item.title}</div>
+              <div className="content-box">
+                <div className="content">{item.description || "설명이 아직 등록되지 않았습니다."}</div>
+              </div>
+              <div className="item-footer">
+                <div className={`tag tag-${item.tag_id}`}>
+                  {getTagName(item.tag_id)}
+                </div>
+                <div className="go">바로 풀기</div>
+              </div>
             </div>
           </Link>
         ))
@@ -138,19 +145,21 @@ export default function QuizList({
 
       {isLoading ? (
         Array.from({ length: 10 }).map((_, index) => (
-          <div className="item" key={`skeleton_${index}`}>
+          <div className="item skeleton-item" key={`skeleton_${index}`}>
             <div className="thumb-nail no-image">
-              <div className="img">
-                <div className="tags">
-                  <div className={`tag tag-${selectTag}`}>
-                    {tagList.find(t => t.tag_id === selectTag)?.name}
-                  </div>
-                </div>
-              </div>
+              <div className="img" />
             </div>
-            <div className="title">[퀴즈]</div>
-            <div className="content-box">
-              <div className="content">퀴즈입니다.</div>
+            <div className="item-body">
+              <div className="title">퀴즈 불러오는 중</div>
+              <div className="content-box">
+                <div className="content">잠시만 기다려주세요.</div>
+              </div>
+              <div className="item-footer">
+                <div className={`tag tag-${selectTag || 0}`}>
+                  {selectTag === 0 ? "전체" : getTagName(selectTag)}
+                </div>
+                <div className="go">Loading</div>
+              </div>
             </div>
           </div>
         ))

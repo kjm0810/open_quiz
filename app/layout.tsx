@@ -1,19 +1,21 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Noto_Sans_KR, Space_Grotesk } from "next/font/google";
 import "./css/reset.scss";
 import "./css/globals.scss";
 import Link from "next/link";
 import LoginBtn from "./LoginBtn";
 import Providers from "./Provider";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const bodyFont = Noto_Sans_KR({
+  variable: "--font-body",
   subsets: ["latin"],
+  weight: ["400", "500", "700", "900"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const displayFont = Space_Grotesk({
+  variable: "--font-display",
   subsets: ["latin"],
+  weight: ["400", "500", "700"],
 });
 
 export const metadata: Metadata = {
@@ -29,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${bodyFont.variable} ${displayFont.variable} antialiased`}
       >
         <header>
           <div className="container">
